@@ -1,0 +1,502 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2980b9;
+  --text-color: #333;
+  --bg-color: #f5f5f5;
+  --card-bg: #fff;
+  --border-color: #eaeaea;
+  --sidebar-width: 250px;
+  --header-height: 60px;
+  --success-color: #27ae60;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  --info-color: #3498db;
+}
+
+/* 다크 테마 */
+[data-theme="dark"] {
+  --primary-color: #3498db;
+  --secondary-color: #2980b9;
+  --text-color: #f5f5f5;
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --border-color: #333;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+/* 레이아웃 */
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  background-color: var(--card-bg);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+.main-content {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* 네비게이션 메뉴 */
+.nav-menu {
+  padding: 16px 0;
+}
+
+.app-title {
+  font-size: 24px;
+  font-weight: bold;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-item {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.nav-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.nav-item.active {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.nav-item svg, .nav-item i {
+  margin-right: 12px;
+  font-size: 20px;
+}
+
+.submenu {
+  padding-left: 16px;
+}
+
+/* 버튼 스타일 */
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button:hover {
+  background-color: var(--secondary-color);
+}
+
+button.secondary {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+button.secondary:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+button.secondary.pinned {
+  color: var(--primary-color);
+}
+
+button i {
+  font-size: 18px;
+  margin-right: 4px;
+}
+
+/* 입력 필드 */
+input, textarea, select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+
+/* 검색 바 */
+.search-bar {
+  margin-bottom: 16px;
+}
+
+.search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  padding: 0 8px;
+}
+
+.search-input-container i {
+  color: #95a5a6;
+  margin-right: 8px;
+}
+
+.search-input-container input {
+  flex: 1;
+  border: none;
+  padding: 10px 0;
+  background: transparent;
+}
+
+.clear-search {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #95a5a6;
+}
+
+.clear-search:hover {
+  color: var(--text-color);
+}
+
+/* 카드 스타일 */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 할 일 항목 스타일 */
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.todo-item:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-item.completed {
+  opacity: 0.7;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+}
+
+.checkbox {
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.checkbox i {
+  font-size: 20px;
+  color: var(--primary-color);
+}
+
+.todo-content {
+  flex: 1;
+  cursor: pointer;
+}
+
+.todo-text {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.todo-metadata {
+  font-size: 12px;
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priority-badge {
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.todo-actions button {
+  padding: 4px;
+  min-width: 36px;
+  height: 36px;
+}
+
+/* 매트릭스 뷰 스타일 */
+.matrix-container {
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.matrix-header {
+  margin-bottom: 24px;
+}
+
+.matrix-header p {
+  color: #7f8c8d;
+  margin-top: 8px;
+}
+
+.matrix-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.matrix-quadrant {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  border: 2px solid;
+  overflow: hidden;
+}
+
+.quadrant-header {
+  padding: 12px 16px;
+  color: white;
+}
+
+.quadrant-header h3 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.quadrant-header p {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.quadrant-tasks {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.matrix-task {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: grab;
+}
+
+.matrix-task:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.matrix-task.completed {
+  opacity: 0.6;
+}
+
+.matrix-task.completed .matrix-task-content {
+  text-decoration: line-through;
+}
+
+.matrix-task-content {
+  flex: 1;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.matrix-task-date {
+  font-size: 11px;
+  color: #7f8c8d;
+  margin-top: 4px;
+}
+
+.add-task-button {
+  margin-top: auto;
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px dashed var(--primary-color);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.add-task-button:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.empty-quadrant {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #95a5a6;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* 모달 스타일 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+/* 뽀모도로 타이머 스타일 */
+.timer-display {
+  font-size: 48px;
+  text-align: center;
+  margin: 32px 0;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* 빈 목록 */
+.empty-list {
+  padding: 32px 16px;
+  text-align: center;
+  color: #95a5a6;
+}
+
+/* 유틸리티 클래스 */
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-8 {
+  gap: 8px;
+} 

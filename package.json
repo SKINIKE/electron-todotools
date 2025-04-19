@@ -1,0 +1,53 @@
+{
+  "name": "electron-todotools",
+  "version": "1.0.0",
+  "description": "Desktop TodoTools Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "watch": "webpack --watch",
+    "dev": "set NODE_ENV=development && .\\node_modules\\.bin\\webpack.cmd && .\\node_modules\\.bin\\electron.cmd .",
+    "reset-db": "powershell -Command \"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; electron reset-db.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production && electron-builder"
+  },
+  "keywords": [
+    "todo",
+    "productivity",
+    "electron",
+    "desktop"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "@babel/preset-react": "^7.23.3",
+    "babel-loader": "^9.1.3",
+    "css-loader": "^6.10.0",
+    "electron": "^29.1.4",
+    "electron-builder": "^24.13.3",
+    "style-loader": "^3.3.4",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-icons": "^4.10.1",
+    "reactstrap": "^9.2.0"
+  },
+  "build": {
+    "appId": "com.todotools.app",
+    "productName": "TodoTools",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.ico"
+    }
+  }
+}
