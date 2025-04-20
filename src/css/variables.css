@@ -1,0 +1,51 @@
+:root {
+  /* ... existing code ... */
+  --primary-color: #4a90e2;
+  --primary-hover: #3a80d2;
+  --secondary-color: #e0e0e0;
+  --secondary-hover: #d0d0d0;
+  --accent-color: #5c6bc0;
+  --accent-hover: #4c5bb0;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --error-color: #d32f2f;
+  --error-bg: #ffebee;
+  --error-border: #ffcdd2;
+  --success-color: #388e3c;
+  --success-bg: #e8f5e9;
+  --success-border: #c8e6c9;
+  --text-secondary: #757575;
+  
+  /* 사이드바 변수 */
+  --sidebar-bg: #f5f5f5;
+  --sidebar-text: #333333;
+  --sidebar-hover: #e0e0e0;
+  --sidebar-active: #e3f2fd;
+}
+
+[data-theme="dark"] {
+  /* ... existing code ... */
+  --primary-color: #64b5f6;
+  --primary-hover: #42a5f5;
+  --secondary-color: #424242;
+  --secondary-hover: #525252;
+  --accent-color: #7986cb;
+  --accent-hover: #5c6bc0;
+  --card-bg: #333333;
+  --input-bg: #424242;
+  --border-color: #555555;
+  --error-color: #ef5350;
+  --error-bg: #452222;
+  --error-border: #5c2929;
+  --success-color: #66bb6a;
+  --success-bg: #223c24;
+  --success-border: #2e4c30;
+  --text-secondary: #b0b0b0;
+  
+  /* 다크 모드 사이드바 변수 */
+  --sidebar-bg-dark: #1e1e1e;
+  --sidebar-text-dark: #e0e0e0;
+  --sidebar-hover-dark: #333333;
+  --sidebar-active-dark: #1a3f5f;
+} 

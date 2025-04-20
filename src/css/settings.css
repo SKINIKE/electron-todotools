@@ -1,0 +1,270 @@
+/* 설정 화면 스타일 */
+.settings-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.settings-container h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: var(--text-color);
+}
+
+.settings-section {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.settings-section h2 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.form-group input[type="number"] {
+  width: 120px;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-button input {
+  flex: 1;
+}
+
+.input-with-button button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--primary-color);
+  color: var(--button-text-color, white);
+  border: none;
+  border-radius: 4px;
+  padding: 0 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* 라이트 모드에서 버튼 텍스트 색상 지정 */
+:root body[data-theme='light'] .button-group button {
+  color: var(--text-color);
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.button-group button:hover {
+  background-color: var(--accent-hover);
+}
+
+.settings-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.settings-footer button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.settings-footer button:hover {
+  background-color: var(--primary-hover);
+}
+
+.settings-footer button.secondary {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.settings-footer button.secondary:hover {
+  background-color: var(--secondary-hover);
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.alert i {
+  margin-right: 8px;
+}
+
+.alert-error {
+  background-color: var(--error-bg);
+  color: var(--error-color);
+  border: 1px solid var(--error-border);
+}
+
+.alert-success {
+  background-color: var(--success-bg);
+  color: var(--success-color);
+  border: 1px solid var(--success-border);
+}
+
+.alert button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: currentColor;
+}
+
+/* 다크 모드에서의 변수 조정은 :root와 [data-theme="dark"] 규칙에서 이미 정의되어 있을 것입니다 */
+
+/* 테마 섹션 스타일 */
+.theme-section {
+  margin-bottom: 30px;
+}
+
+.theme-options {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  width: 150px;
+}
+
+.theme-option:hover {
+  background-color: var(--hover-color);
+}
+
+.theme-option.active {
+  border-color: var(--primary-color);
+  background-color: var(--selected-bg);
+}
+
+.theme-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.theme-preview i {
+  font-size: 48px;
+}
+
+.light-theme {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #dddddd;
+}
+
+.dark-theme {
+  background-color: #222222;
+  color: #ffffff;
+  border: 1px solid #444444;
+}
+
+.theme-option span {
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.button-group button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--accent-color);
+  color: var(--button-text-color, white);
+  border: none;
+  border-radius: 4px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+/* 라이트 모드에서 버튼 텍스트 색상 강제 지정 */
+body[data-theme='light'] .settings-container .button-group button {
+  color: var(--text-color) !important;
+}
+
+.button-group button:hover {
+  background-color: var(--accent-hover);
+} 

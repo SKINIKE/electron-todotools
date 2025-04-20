@@ -8,7 +8,7 @@ const ThemeProvider = ({ children }) => {
   // 기본 테마는 시스템 설정 따르기
   const [theme, setTheme] = useState(() => {
     // 저장된 테마가 있으면 사용, 없으면 시스템 테마 검사
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem('appTheme');
     if (savedTheme) {
       return savedTheme;
     }
@@ -25,7 +25,15 @@ const ThemeProvider = ({ children }) => {
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+    localStorage.setItem('appTheme', newTheme);
+  };
+  
+  // 특정 테마로 직접 설정하는 함수
+  const setAppTheme = (newTheme) => {
+    if (newTheme === 'light' || newTheme === 'dark') {
+      setTheme(newTheme);
+      localStorage.setItem('appTheme', newTheme);
+    }
   };
 
   // 테마가 변경될 때마다 body의 data-theme 속성 업데이트
@@ -34,7 +42,7 @@ const ThemeProvider = ({ children }) => {
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setAppTheme }}>
       {children}
     </ThemeContext.Provider>
   );

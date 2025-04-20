@@ -1,53 +1,53 @@
 {
   "name": "electron-todotools",
   "version": "1.0.0",
-  "description": "Desktop TodoTools Application",
+  "description": "할 일 관리 및 생산성 도구 모음",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "watch": "webpack --watch",
-    "dev": "set NODE_ENV=development && .\\node_modules\\.bin\\webpack.cmd && .\\node_modules\\.bin\\electron.cmd .",
-    "reset-db": "powershell -Command \"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; electron reset-db.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode production && electron-builder"
-  },
-  "keywords": [
-    "todo",
-    "productivity",
-    "electron",
-    "desktop"
-  ],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@babel/core": "^7.23.9",
-    "@babel/preset-env": "^7.23.9",
-    "@babel/preset-react": "^7.23.3",
-    "babel-loader": "^9.1.3",
-    "css-loader": "^6.10.0",
-    "electron": "^29.1.4",
-    "electron-builder": "^24.13.3",
-    "style-loader": "^3.3.4",
-    "webpack": "^5.90.3",
-    "webpack-cli": "^5.1.4"
-  },
-  "dependencies": {
-    "electron-store": "^8.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-beautiful-dnd": "^13.1.1",
-    "react-icons": "^4.10.1",
-    "reactstrap": "^9.2.0"
+    "start": "npm run build && electron .",
+    "dev": "npm run build && electron .",
+    "build": "webpack",
+    "dist": "electron-builder --win",
+    "pack": "electron-builder --dir",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "build": {
-    "appId": "com.todotools.app",
+    "appId": "com.electron.todotools",
     "productName": "TodoTools",
     "directories": {
       "output": "dist"
     },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "build/**/*",
+      "assets/**/*",
+      "src/services/store.js"
+    ],
     "win": {
-      "target": "portable",
-      "icon": "build/icon.ico"
+      "target": "portable"
     }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.17.9",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "babel-loader": "^8.2.5",
+    "css-loader": "^6.7.1",
+    "electron": "^29.4.6",
+    "electron-builder": "^24.13.3",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-icons": "^4.3.1"
   }
 }

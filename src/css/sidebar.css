@@ -1,0 +1,90 @@
+/* 사이드바 스타일 */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  height: 100%;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.app-title {
+  padding: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  color: var(--primary-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-menu {
+  flex: 1;
+  padding: 10px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+  background-color: var(--sidebar-hover);
+}
+
+.nav-item.active {
+  background-color: var(--sidebar-active);
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.nav-item i {
+  margin-right: 12px;
+}
+
+.submenu {
+  margin-left: 10px;
+}
+
+.submenu .nav-item {
+  padding-left: 30px;
+}
+
+/* 사이드바 푸터 스타일 */
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+  background-color: var(--sidebar-hover);
+}
+
+/* 다크 모드 전환 */
+[data-theme="dark"] .sidebar {
+  background-color: var(--sidebar-bg-dark);
+  color: var(--sidebar-text-dark);
+  border-right-color: var(--border-color-dark);
+}
+
+[data-theme="dark"] .nav-item:hover {
+  background-color: var(--sidebar-hover-dark);
+}
+
+[data-theme="dark"] .nav-item.active {
+  background-color: var(--sidebar-active-dark);
+} 

@@ -1,100 +1,126 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import TaskService from '../services/TaskService';
+import TaskModal from './AddTaskModal'; // 이름 변경된 모달 import
+import { FaEdit, FaTrashAlt, FaPlus, FaThumbtack } from 'react-icons/fa';
 
 const TaskList = ({ showTodayOnly, showPinnedOnly }) => {
   // 할 일 목록 상태
   const [tasks, setTasks] = useState([]);
-  // 새 할 일 입력 상태
-  const [newTaskText, setNewTaskText] = useState('');
-  // 할 일 추가 모달 상태
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  // 할 일 수정 모달 상태
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // 새 할 일 입력 상태 (모달에서 관리하도록 변경될 수 있음)
+  const [newTaskText, setNewTaskText] = useState(''); 
+  // 할 일 추가 모달 상태 복구
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 통합
+  // 할 일 수정 모달 상태 (수정 기능 복구 시 필요)
+  const [currentTask, setCurrentTask] = useState(null); // 수정할 작업 상태 복구
   // 검색어 상태
   const [searchQuery, setSearchQuery] = useState('');
-  // 현재 수정 중인 할 일
-  const [currentTask, setCurrentTask] = useState(null);
-  // 새 할 일 날짜
-  const [newTaskDate, setNewTaskDate] = useState('');
-  // 새 할 일 중요도
-  const [newTaskPriority, setNewTaskPriority] = useState('none');
-  // 새 할 일 고정 여부
-  const [newTaskPinned, setNewTaskPinned] = useState(false);
+  // 새 할 일 날짜 (모달에서 관리하도록 변경될 수 있음)
+  const [newTaskDate, setNewTaskDate] = useState(''); 
+  // 새 할 일 중요도 (모달에서 관리하도록 변경될 수 있음)
+  const [newTaskPriority, setNewTaskPriority] = useState('none'); 
+  // 새 할 일 고정 여부 (모달에서 관리하도록 변경될 수 있음)
+  const [newTaskPinned, setNewTaskPinned] = useState(false); 
   // 로딩 상태
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   // 오류 메시지
   const [error, setError] = useState(null);
+  // 새로고침 트리거 상태
+  const [refreshKey, setRefreshKey] = useState(0);
   
   // 가상의 할 일 목록 (실제로는 DB에서 가져올 예정)
-  const dummyTasks = [
-    { id: 1, title: '리액트 컴포넌트 작성하기', completed: false, date: new Date(), priority: 'high', pinned: true },
-    { id: 2, title: '일렉트론 앱 빌드하기', completed: false, date: new Date(), priority: 'medium', pinned: false },
-    { id: 3, title: 'CSS 스타일 적용하기', completed: true, date: new Date(Date.now() - 86400000), priority: 'low', pinned: false },
-    { id: 4, title: '패키징 스크립트 작성하기', completed: false, date: new Date(Date.now() + 86400000), priority: 'high', pinned: false },
-  ];
-  
-  // 컴포넌트 마운트 시 할 일 목록 가져오기
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+  // ... (dummyTasks 제거 또는 유지)
 
-  // 데이터베이스에서 할 일 목록 가져오기
-  const fetchTasks = async () => {
+  // 데이터 로드 함수 (useCallback으로 감싸기)
+  const loadTasks = useCallback(async () => {
+    console.log('TaskList: 작업 목록 로드 시작');
     setIsLoading(true);
     setError(null);
-    
     try {
-      // SQLite 사용 시
-      if (window.require) {
-        const tasks = await TaskService.getAllTasks();
-        console.log('SQLite에서 할 일 가져옴:', tasks);
-        setTasks(tasks);
-      } else {
-        // 개발 환경이나 SQLite를 사용할 수 없는 경우 로컬 스토리지 사용
-        const savedTasks = localStorage.getItem('todoTasks');
-        if (savedTasks) {
-          try {
-            const parsedTasks = JSON.parse(savedTasks);
-            // 날짜 문자열을 Date 객체로 변환
-            const formattedTasks = parsedTasks.map(task => ({
-              ...task,
-              date: new Date(task.date)
-            }));
-            setTasks(formattedTasks);
-            console.log('LocalStorage에서 할 일 불러옴:', formattedTasks);
-          } catch (error) {
-            console.error('LocalStorage에서 할 일 불러오기 실패:', error);
-            setTasks(dummyTasks);
-          }
-        } else {
-          setTasks(dummyTasks);
-          console.log('기본 할 일 목록 설정:', dummyTasks);
-        }
-      }
-    } catch (error) {
-      console.error('할 일 가져오기 오류:', error);
-      setError('할 일을 가져오는 중 오류가 발생했습니다.');
-      
-      // 백업으로 로컬 스토리지 사용
-      const savedTasks = localStorage.getItem('todoTasks');
-      if (savedTasks) {
-        try {
-          const parsedTasks = JSON.parse(savedTasks);
-          const formattedTasks = parsedTasks.map(task => ({
-            ...task,
-            date: new Date(task.date)
-          }));
-          setTasks(formattedTasks);
-        } catch (e) {
-          setTasks(dummyTasks);
-        }
-      } else {
-        setTasks(dummyTasks);
-      }
+      const fetchedTasks = await TaskService.getAllTasks();
+      console.log('TaskList: 작업 목록 로드 완료:', fetchedTasks);
+      // 날짜 필터링 적용 (데이터 로드 시)
+      const filteredTasks = filterTasks(fetchedTasks, searchQuery, showTodayOnly, showPinnedOnly);
+      setTasks(filteredTasks);
+    } catch (err) {
+      console.error('TaskList: 작업 목록 로드 오류:', err);
+      setError('작업 목록을 불러오는 데 실패했습니다.');
+      setTasks([]); // 오류 시 빈 배열로 설정
     } finally {
       setIsLoading(false);
     }
+  }, [searchQuery, showTodayOnly, showPinnedOnly]);
+
+  // 컴포넌트 마운트 시 및 필터/새로고침 키 변경 시 데이터 로드
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks, refreshKey]);
+
+  // 'tasks-updated' 이벤트 리스너 추가 (컴포넌트 마운트 시)
+  useEffect(() => {
+    const handleTasksUpdated = () => {
+      console.log('TaskList: tasks-updated 이벤트 수신, 목록 새로고침');
+      setRefreshKey(prevKey => prevKey + 1); // 새로고침 트리거 상태 변경
+    };
+
+    if (window.electronAPI) { // electronAPI 존재 확인
+       // 이벤트 리스너 등록 로직 필요 (preload.js에 추가해야 함)
+       // 예시: const unsubscribe = window.electronAPI.onTasksUpdated(handleTasksUpdated);
+       // 여기서는 preload.js 수정 없이 임시로 ipcRenderer 직접 사용 (권장되지 않음)
+       const ipcRenderer = window.require ? window.require('electron').ipcRenderer : null;
+       if (ipcRenderer) {
+           console.log('TaskList: ipcRenderer 이벤트 리스너 등록');
+           ipcRenderer.on('tasks-updated', handleTasksUpdated);
+           // 컴포넌트 언마운트 시 리스너 제거
+           return () => {
+               console.log('TaskList: ipcRenderer 이벤트 리스너 제거');
+               ipcRenderer.removeListener('tasks-updated', handleTasksUpdated);
+           };
+       } else {
+           console.warn('TaskList: ipcRenderer 사용 불가');
+       }
+    }
+
+  }, []); // 마운트 시 한 번만 실행
+
+  // 필터링 함수
+  const filterTasks = (tasksToFilter, term, todayOnly, pinnedOnly) => {
+    let filtered = tasksToFilter;
+
+    // 검색어 필터링
+    if (term) {
+      filtered = filtered.filter(task => 
+        task.title.toLowerCase().includes(term.toLowerCase())
+      );
+    }
+    
+    // 오늘 할 일 필터링 (Date 객체 비교로 수정)
+    if (todayOnly) {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0); // 오늘 날짜 자정
+      const todayEnd = new Date();
+      todayEnd.setHours(23, 59, 59, 999); // 오늘 날짜 마지막 밀리초
+
+      filtered = filtered.filter(task => {
+        // task.date가 유효한 Date 객체인지 확인 후 비교
+        return task.date && task.date instanceof Date && 
+               task.date >= todayStart && task.date <= todayEnd;
+      });
+    }
+
+    // 고정된 할 일 필터링
+    if (pinnedOnly) {
+      filtered = filtered.filter(task => task.pinned);
+    }
+
+    return filtered;
   };
+
+  // 검색어 변경 시 필터링 다시 적용
+  useEffect(() => {
+    // 검색어 변경 시에는 새로 로드할 필요 없이 기존 tasks 상태를 필터링
+    // loadTasks() 대신 별도 필터링 로직 실행 (하지만 현재 loadTasks 의존성에 searchTerm 포함됨)
+    // loadTasks()를 호출하여 필터링된 결과를 다시 가져오도록 유지
+  }, [searchQuery, showTodayOnly, showPinnedOnly]); // loadTasks 의존성 변경 시 자동 재실행됨
 
   // 날짜를 YYYY-MM-DD 형식으로 변환
   const formatDateForInput = (date) => {
@@ -115,195 +141,66 @@ const TaskList = ({ showTodayOnly, showPinnedOnly }) => {
     return new Date(date).toLocaleDateString('ko-KR', options);
   };
 
-  // 할 일 추가 모달 초기화
+  // 할 일 추가 모달 열기
   const openAddModal = () => {
-    setNewTaskText('');
-    setNewTaskDate(formatDateForInput(new Date()));
-    setNewTaskPriority('none');
-    setNewTaskPinned(false);
-    setIsAddModalOpen(true);
+    setCurrentTask(null); // 추가 모드: currentTask를 null로 설정
+    setIsModalOpen(true);
   };
 
-  // 할 일 수정 모달 초기화
+  // 할 일 수정 모달 열기 함수 복구
   const openEditModal = (task) => {
-    setCurrentTask(task);
-    setNewTaskText(task.title);
-    setNewTaskDate(formatDateForInput(task.date));
-    setNewTaskPriority(task.priority || 'none');
-    setNewTaskPinned(task.pinned);
-    setIsEditModalOpen(true);
+    setCurrentTask(task); // 수정 모드: currentTask를 선택된 작업으로 설정
+    setIsModalOpen(true);
   };
 
-  // 필터링된 할 일 목록
-  const filteredTasks = tasks.filter(task => {
-    // 먼저 검색어로 필터링
-    if (searchQuery.trim() !== '') {
-      if (!task.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
-      }
-    }
-    
-    // 오늘 할 일만 보기
-    if (showTodayOnly) {
-      const today = new Date();
-      const taskDate = new Date(task.date);
-      return (
-        taskDate.getDate() === today.getDate() &&
-        taskDate.getMonth() === today.getMonth() &&
-        taskDate.getFullYear() === today.getFullYear()
-      );
-    }
-    
-    // 고정된 할 일만 보기
-    if (showPinnedOnly) {
-      return task.pinned;
-    }
-    
-    // 모든 할 일
-    return true;
-  });
+  // 할 일 저장 함수 (추가/수정 통합)
+  const handleSaveTask = async (taskData) => { 
+    console.log("TaskList: handleSaveTask 호출됨", taskData);
+    setError(null); // 이전 오류 메시지 초기화
 
-  // 할 일 추가 함수
-  const addTask = async () => {
-    if (newTaskText.trim() === '') return;
-    
-    // 우선순위 기반으로 매트릭스 속성 설정
-    let importance = 'low';
-    let urgency = 'low';
-    let quadrant = 4;
-    
-    switch(newTaskPriority) {
-      case 'high':
-        importance = 'high';
-        urgency = 'high';
-        quadrant = 1;
-        break;
-      case 'medium':
-        importance = 'high';
-        urgency = 'low';
-        quadrant = 2;
-        break;
-      case 'low':
-        importance = 'low';
-        urgency = 'high';
-        quadrant = 3;
-        break;
-      case 'none':
-      default:
-        importance = 'low';
-        urgency = 'low';
-        quadrant = 4;
-        break;
-    }
-    
-    const newTask = {
-      title: newTaskText,
-      completed: false,
-      date: newTaskDate ? new Date(newTaskDate) : new Date(),
-      priority: newTaskPriority,
-      pinned: newTaskPinned,
-      // 매트릭스 뷰 관련 속성 추가
-      importance: importance,
-      urgency: urgency,
-      quadrant: quadrant
-    };
-    
     try {
-      if (window.require) {
-        // SQLite 사용
-        const addedTask = await TaskService.addTask(newTask);
-        setTasks([...tasks, addedTask]);
-        console.log('SQLite에 할 일 추가됨:', addedTask);
-      } else {
-        // 로컬 스토리지 사용
-        const taskWithId = { ...newTask, id: Date.now() };
-        const updatedTasks = [...tasks, taskWithId];
-        setTasks(updatedTasks);
-        localStorage.setItem('todoTasks', JSON.stringify(updatedTasks));
-        console.log('LocalStorage에 할 일 추가됨:', taskWithId);
+      if (taskData.id) { // ID가 있으면 수정
+        // taskData에는 모달에서 입력된 값이 들어옴 (completed 포함)
+        const taskToUpdate = {
+            ...taskData, // id, title, date, priority, pinned, completed
+            date: taskData.date ? new Date(taskData.date) : new Date(), // Date 객체로
+            // 매트릭스 관련 필드 업데이트 (TaskService에서 처리하도록 위임 가능)
+            importance: taskData.priority === 'high' || taskData.priority === 'medium' ? 'high' : 'low',
+            urgency: currentTask?.urgency || 'low', // 기존 urgency 유지 또는 기본값
+            quadrant: taskData.priority === 'high' || taskData.priority === 'medium' ? 2 : 4
+        };
+        console.log("수정할 작업:", taskToUpdate);
+        await TaskService.updateTask(taskToUpdate);
+        console.log('할 일 수정 성공');
+      } else { // ID가 없으면 추가
+        const newTask = {
+          title: taskData.title.trim(),
+          completed: false, // 추가 시에는 항상 false
+          date: taskData.date ? new Date(taskData.date) : new Date(),
+          priority: taskData.priority || 'none',
+          pinned: taskData.pinned || false,
+          importance: taskData.priority === 'high' || taskData.priority === 'medium' ? 'high' : 'low',
+          urgency: 'low',
+          quadrant: taskData.priority === 'high' || taskData.priority === 'medium' ? 2 : 4
+        };
+        console.log("추가할 작업:", newTask);
+        await TaskService.addTask(newTask);
+        console.log('할 일 추가 성공');
       }
+      setRefreshKey(prevKey => prevKey + 1); // 성공 시 목록 새로고침
     } catch (error) {
-      console.error('할 일 추가 오류:', error);
-      setError('할 일을 추가하는 중 오류가 발생했습니다.');
-      
-      // 로컬 스토리지에 백업
-      const taskWithId = { ...newTask, id: Date.now() };
-      const updatedTasks = [...tasks, taskWithId];
-      setTasks(updatedTasks);
-      localStorage.setItem('todoTasks', JSON.stringify(updatedTasks));
+      console.error('할 일 저장 오류:', error);
+      setError('할 일 저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsModalOpen(false); // 모달 닫기
+      setCurrentTask(null); // currentTask 초기화
     }
-    
-    setIsAddModalOpen(false);
   };
 
-  // 할 일 수정 함수
-  const updateTask = async () => {
-    if (newTaskText.trim() === '') return;
-    
-    // 우선순위 기반으로 매트릭스 속성 설정
-    let importance = 'low';
-    let urgency = 'low';
-    let quadrant = 4;
-    
-    switch(newTaskPriority) {
-      case 'high':
-        importance = 'high';
-        urgency = 'high';
-        quadrant = 1;
-        break;
-      case 'medium':
-        importance = 'high';
-        urgency = 'low';
-        quadrant = 2;
-        break;
-      case 'low':
-        importance = 'low';
-        urgency = 'high';
-        quadrant = 3;
-        break;
-      case 'none':
-      default:
-        importance = 'low';
-        urgency = 'low';
-        quadrant = 4;
-        break;
-    }
-    
-    const updatedTask = {
-      ...currentTask,
-      title: newTaskText,
-      date: newTaskDate ? new Date(newTaskDate) : new Date(),
-      priority: newTaskPriority,
-      pinned: newTaskPinned,
-      importance: importance,
-      urgency: urgency,
-      quadrant: quadrant
-    };
-    
-    try {
-      if (window.require) {
-        // SQLite 사용
-        await TaskService.updateTask(updatedTask);
-        setTasks(tasks.map(task => task.id === currentTask.id ? updatedTask : task));
-        console.log('SQLite에서 할 일 업데이트됨:', updatedTask);
-      } else {
-        // 로컬 스토리지 사용
-        const updatedTasks = tasks.map(task => task.id === currentTask.id ? updatedTask : task);
-        setTasks(updatedTasks);
-        localStorage.setItem('todoTasks', JSON.stringify(updatedTasks));
-        console.log('LocalStorage에서 할 일 업데이트됨:', updatedTask);
-      }
-    } catch (error) {
-      console.error('할 일 업데이트 오류:', error);
-      setError('할 일을 업데이트하는 중 오류가 발생했습니다.');
-      
-      // 로컬 스토리지에 백업
-      const updatedTasks = tasks.map(task => task.id === currentTask.id ? updatedTask : task);
-      setTasks(updatedTasks);
-      localStorage.setItem('todoTasks', JSON.stringify(updatedTasks));
-    }
-    
-    setIsEditModalOpen(false);
+  // 모달 닫기 함수
+  const handleCloseModal = () => {
+      setIsModalOpen(false);
+      setCurrentTask(null); // 모달 닫을 때 currentTask 초기화
   };
 
   // 할 일 완료 상태 토글 함수
@@ -317,23 +214,15 @@ const TaskList = ({ showTodayOnly, showPinnedOnly }) => {
     };
     
     try {
-      if (window.require) {
-        // SQLite 사용
-        await TaskService.updateTask(updatedTask);
-        setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
-        console.log('SQLite에서 할 일 완료 상태 토글:', updatedTask);
-      } else {
-        // 로컬 스토리지 사용
-        const updatedTasks = tasks.map(task => task.id === taskId ? updatedTask : task);
-        setTasks(updatedTasks);
-        localStorage.setItem('todoTasks', JSON.stringify(updatedTasks));
-        console.log('LocalStorage에서 할 일 완료 상태 토글:', updatedTask);
-      }
+      // TaskService를 통해 할 일 업데이트
+      await TaskService.updateTask(updatedTask);
+      setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
+      console.log('할 일 완료 상태 토글됨:', updatedTask);
     } catch (error) {
       console.error('할 일 완료 상태 토글 오류:', error);
       setError('할 일 상태를 변경하는 중 오류가 발생했습니다.');
       
-      // UI 업데이트는 사용자 경험을 위해 유지
+      // UI 업데이트는 유지
       setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
     }
   };
@@ -349,23 +238,15 @@ const TaskList = ({ showTodayOnly, showPinnedOnly }) => {
     };
     
     try {
-      if (window.require) {
-        // SQLite 사용
-        await TaskService.updateTask(updatedTask);
-        setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
-        console.log('SQLite에서 할 일 고정 상태 토글:', updatedTask);
-      } else {
-        // 로컬 스토리지 사용
-        const updatedTasks = tasks.map(task => task.id === taskId ? updatedTask : task);
-        setTasks(updatedTasks);
-        localStorage.setItem('todoTasks', JSON.stringify(updatedTasks));
-        console.log('LocalStorage에서 할 일 고정 상태 토글:', updatedTask);
-      }
+      // TaskService를 통해 할 일 업데이트
+      await TaskService.updateTask(updatedTask);
+      setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
+      console.log('할 일 고정 상태 토글됨:', updatedTask);
     } catch (error) {
       console.error('할 일 고정 상태 토글 오류:', error);
       setError('할 일 고정 상태를 변경하는 중 오류가 발생했습니다.');
       
-      // UI 업데이트는 사용자 경험을 위해 유지
+      // UI 업데이트는 유지
       setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
     }
   };
@@ -373,23 +254,15 @@ const TaskList = ({ showTodayOnly, showPinnedOnly }) => {
   // 할 일 삭제 함수
   const deleteTask = async (taskId) => {
     try {
-      if (window.require) {
-        // SQLite 사용
-        await TaskService.deleteTask(taskId);
-        setTasks(tasks.filter(task => task.id !== taskId));
-        console.log('SQLite에서 할 일 삭제됨, ID:', taskId);
-      } else {
-        // 로컬 스토리지 사용
-        const updatedTasks = tasks.filter(task => task.id !== taskId);
-        setTasks(updatedTasks);
-        localStorage.setItem('todoTasks', JSON.stringify(updatedTasks));
-        console.log('LocalStorage에서 할 일 삭제됨, ID:', taskId);
-      }
+      // TaskService를 통해 할 일 삭제
+      await TaskService.deleteTask(taskId);
+      setTasks(tasks.filter(task => task.id !== taskId));
+      console.log('할 일 삭제됨, ID:', taskId);
     } catch (error) {
       console.error('할 일 삭제 오류:', error);
       setError('할 일을 삭제하는 중 오류가 발생했습니다.');
       
-      // UI 업데이트는 사용자 경험을 위해 유지
+      // UI 업데이트는 유지
       setTasks(tasks.filter(task => task.id !== taskId));
     }
   };
@@ -426,11 +299,21 @@ const TaskList = ({ showTodayOnly, showPinnedOnly }) => {
     );
   };
 
+  // 로딩 및 오류 상태 표시
+  if (isLoading) {
+    return <div className="loading-indicator">로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">오류: {error}</div>;
+  }
+
   return (
     <div className="task-list-container">
       <div className="flex justify-between items-center mb-16">
         <h1>{showTodayOnly ? '오늘 할 일' : (showPinnedOnly ? '고정된 할 일' : '모든 할 일')}</h1>
-        <button onClick={openAddModal}>
+        {/* 새 할 일 버튼 복구 */}
+        <button onClick={openAddModal}> 
           <i className="material-icons">add</i> 새 할 일
         </button>
       </div>
@@ -464,179 +347,53 @@ const TaskList = ({ showTodayOnly, showPinnedOnly }) => {
         </div>
       )}
       
-      {/* 로딩 상태 */}
-      {isLoading ? (
-        <div className="loading-container">
-          <p>데이터를 불러오는 중...</p>
-        </div>
-      ) : (
-        /* 할 일 목록 */
-        <div className="card">
-          {filteredTasks.length === 0 ? (
-            <div className="empty-list">
-              <p>할 일이 없습니다.</p>
-            </div>
-          ) : (
-            filteredTasks.map(task => (
-              <div key={task.id} className={`todo-item ${task.completed ? 'completed' : ''}`}>
-                <div className="checkbox" onClick={() => toggleTaskCompleted(task.id)}>
-                  <i className="material-icons">
-                    {task.completed ? 'check_circle' : 'radio_button_unchecked'}
-                  </i>
-                </div>
-                <div className="todo-content" onClick={() => openEditModal(task)}>
-                  <div className="todo-text">{task.title}</div>
-                  <div className="todo-metadata">
-                    {formatDate(task.date)} {priorityBadge(task.priority)}
-                  </div>
-                </div>
-                <div className="todo-actions">
-                  <button 
-                    className={`secondary ${task.pinned ? 'pinned' : ''}`} 
-                    onClick={() => toggleTaskPinned(task.id)}
-                  >
-                    <i className="material-icons">
-                      {task.pinned ? 'push_pin' : 'push_pin'}
-                    </i>
-                  </button>
-                  <button className="secondary" onClick={() => deleteTask(task.id)}>
-                    <i className="material-icons">delete</i>
-                  </button>
+      {/* 할 일 목록 */}
+      <div className="card">
+        {tasks.length === 0 ? (
+          <div className="empty-list">
+            <p>할 일이 없습니다.</p>
+          </div>
+        ) : (
+          tasks.map(task => (
+            <div key={task.id} className={`todo-item ${task.completed ? 'completed' : ''}`}>
+              <div className="checkbox" onClick={() => toggleTaskCompleted(task.id)}>
+                <i className="material-icons">
+                  {task.completed ? 'check_circle' : 'radio_button_unchecked'}
+                </i>
+              </div>
+              <div className="todo-content" onClick={() => openEditModal(task)}>
+                <div className="todo-text">{task.title}</div>
+                <div className="todo-metadata">
+                  {task.date instanceof Date ? formatDate(task.date) : '날짜 없음'} {priorityBadge(task.priority)}
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      )}
+              <div className="todo-actions">
+                <button 
+                  className={`secondary ${task.pinned ? 'pinned' : ''}`} 
+                  onClick={(e) => { e.stopPropagation(); toggleTaskPinned(task.id); }}
+                >
+                  <i className="material-icons">
+                    {task.pinned ? 'push_pin' : 'push_pin'}
+                  </i>
+                </button>
+                <button className="secondary" onClick={(e) => { e.stopPropagation(); deleteTask(task.id); }}>
+                  <i className="material-icons">delete</i>
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
       
-      {/* 할 일 추가 모달 */}
-      {isAddModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>새 할 일 추가</h2>
-            
-            <div className="form-group">
-              <label>제목</label>
-              <input
-                type="text"
-                placeholder="할 일 내용"
-                value={newTaskText}
-                onChange={(e) => setNewTaskText(e.target.value)}
-                autoFocus
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>날짜</label>
-              <input
-                type="date"
-                value={newTaskDate}
-                onChange={(e) => setNewTaskDate(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>중요도</label>
-              <select 
-                value={newTaskPriority} 
-                onChange={(e) => setNewTaskPriority(e.target.value)}
-              >
-                <option value="high">높음</option>
-                <option value="medium">중간</option>
-                <option value="low">낮음</option>
-                <option value="none">선택안함</option>
-              </select>
-            </div>
-            
-            <div className="form-group checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={newTaskPinned}
-                  onChange={(e) => setNewTaskPinned(e.target.checked)}
-                />
-                고정하기
-              </label>
-            </div>
-            
-            <div className="modal-actions">
-              <button onClick={addTask}>추가</button>
-              <button className="secondary" onClick={() => setIsAddModalOpen(false)}>취소</button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* 할 일 수정 모달 */}
-      {isEditModalOpen && currentTask && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>할 일 수정</h2>
-            
-            <div className="form-group">
-              <label>제목</label>
-              <input
-                type="text"
-                placeholder="할 일 내용"
-                value={newTaskText}
-                onChange={(e) => setNewTaskText(e.target.value)}
-                autoFocus
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>날짜</label>
-              <input
-                type="date"
-                value={newTaskDate}
-                onChange={(e) => setNewTaskDate(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>중요도</label>
-              <select 
-                value={newTaskPriority} 
-                onChange={(e) => setNewTaskPriority(e.target.value)}
-              >
-                <option value="high">높음</option>
-                <option value="medium">중간</option>
-                <option value="low">낮음</option>
-                <option value="none">선택안함</option>
-              </select>
-            </div>
-            
-            <div className="form-group checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={newTaskPinned}
-                  onChange={(e) => setNewTaskPinned(e.target.checked)}
-                />
-                고정하기
-              </label>
-            </div>
-            
-            <div className="form-group checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={currentTask.completed}
-                  onChange={(e) => {
-                    setCurrentTask({...currentTask, completed: e.target.checked});
-                  }}
-                />
-                완료됨
-              </label>
-            </div>
-            
-            <div className="modal-actions">
-              <button onClick={updateTask}>저장</button>
-              <button className="secondary" onClick={() => setIsEditModalOpen(false)}>취소</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 통합된 모달 렌더링 */}
+      {isModalOpen && 
+        <TaskModal 
+          isOpen={isModalOpen} 
+          onClose={handleCloseModal} 
+          onSaveTask={handleSaveTask} // onAddTask 대신 onSaveTask 전달
+          taskToEdit={currentTask} // 수정할 작업 데이터 전달 (추가 시 null)
+        />
+      }
     </div>
   );
 };

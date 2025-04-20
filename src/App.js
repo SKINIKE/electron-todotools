@@ -6,7 +6,9 @@ import CalendarView from './components/CalendarView';
 import PomodoroTimer from './components/PomodoroTimer';
 import Calculator from './components/Calculator';
 import StickyNotes from './components/StickyNotes';
+import SettingsProvider from './context/SettingsContext';
 import ThemeProvider from './context/ThemeContext';
+import SettingsView from './components/SettingsView';
 
 // 메뉴 타입 정의
 const MenuType = {
@@ -15,7 +17,8 @@ const MenuType = {
   CALENDAR: 'calendar',
   POMODORO: 'pomodoro',
   CALCULATOR: 'calculator',
-  STICKY_NOTES: 'stickyNotes'
+  STICKY_NOTES: 'stickyNotes',
+  SETTINGS: 'settings'
 };
 
 function App() {
@@ -25,8 +28,26 @@ function App() {
   const [showTodayOnly, setShowTodayOnly] = useState(false);
   const [showPinnedOnly, setShowPinnedOnly] = useState(false);
 
+  // 메뉴 변경 핸들러
+  const handleMenuChange = (menuType) => {
+    setSelectedMenu(menuType);
+  };
+
+  // body에 테마 클래스가 있는지 확인하고 없으면 추가
+  useEffect(() => {
+    const body = document.body;
+    if (!body.hasAttribute('data-theme')) {
+      body.setAttribute('data-theme', 'light');
+    }
+  }, []);
+
   // 선택된 메뉴에 따라 다른 컴포넌트 렌더링
   const renderContent = () => {
+    // 설정 메뉴인 경우
+    if (selectedMenu === MenuType.SETTINGS) {
+      return <SettingsView />;
+    }
+    
     switch (selectedMenu) {
       case MenuType.TASKS:
         return (
@@ -52,19 +73,21 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="app-container">
-        <Sidebar 
-          selectedMenu={selectedMenu} 
-          setSelectedMenu={setSelectedMenu}
-          showTodayOnly={showTodayOnly}
-          setShowTodayOnly={setShowTodayOnly}
-          showPinnedOnly={showPinnedOnly}
-          setShowPinnedOnly={setShowPinnedOnly}
-        />
-        <div className="main-content">
-          {renderContent()}
+      <SettingsProvider>
+        <div className="app-container">
+          <Sidebar 
+            selectedMenu={selectedMenu} 
+            setSelectedMenu={handleMenuChange}
+            showTodayOnly={showTodayOnly}
+            setShowTodayOnly={setShowTodayOnly}
+            showPinnedOnly={showPinnedOnly}
+            setShowPinnedOnly={setShowPinnedOnly}
+          />
+          <div className="main-content">
+            {renderContent()}
+          </div>
         </div>
-      </div>
+      </SettingsProvider>
     </ThemeProvider>
   );
 }

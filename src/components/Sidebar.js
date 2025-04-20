@@ -1,14 +1,14 @@
-import React, { useState, useContext } from 'react';
-import { ThemeContext } from '../context/ThemeContext';
+import React, { useState } from 'react';
 
-// 메뉴 타입 정의
+// 메뉴 타입 정의 (App.js와 동기화)
 const MenuType = {
   TASKS: 'tasks',
   MATRIX: 'matrix',
   CALENDAR: 'calendar',
   POMODORO: 'pomodoro',
   CALCULATOR: 'calculator',
-  STICKY_NOTES: 'stickyNotes'
+  STICKY_NOTES: 'stickyNotes',
+  SETTINGS: 'settings'
 };
 
 const Sidebar = ({ 
@@ -19,9 +19,6 @@ const Sidebar = ({
   showPinnedOnly,
   setShowPinnedOnly 
 }) => {
-  // 테마 컨텍스트 사용
-  const { theme, toggleTheme } = useContext(ThemeContext);
-
   // 메뉴 확장 상태
   const [todoMenuExpanded, setTodoMenuExpanded] = useState(true);
   const [productivityMenuExpanded, setProductivityMenuExpanded] = useState(false);
@@ -115,7 +112,7 @@ const Sidebar = ({
           <span>캘린더</span>
         </div>
         
-        {/* 생산성 도구 상위 메뉴 (접을 수 있음) */}
+        {/* 생산성 도구 메뉴 */}
         <div 
           className="nav-item"
           onClick={() => setProductivityMenuExpanded(!productivityMenuExpanded)}
@@ -127,10 +124,8 @@ const Sidebar = ({
           </i>
         </div>
         
-        {/* 생산성 도구 하위 메뉴 */}
         {productivityMenuExpanded && (
           <div className="submenu">
-            {/* 뽀모도로 타이머 메뉴 */}
             <div 
               className={`nav-item ${selectedMenu === MenuType.POMODORO ? 'active' : ''}`}
               onClick={() => setSelectedMenu(MenuType.POMODORO)}
@@ -139,7 +134,6 @@ const Sidebar = ({
               <span>뽀모도로 타이머</span>
             </div>
             
-            {/* 계산기 메뉴 */}
             <div 
               className={`nav-item ${selectedMenu === MenuType.CALCULATOR ? 'active' : ''}`}
               onClick={() => setSelectedMenu(MenuType.CALCULATOR)}
@@ -148,7 +142,6 @@ const Sidebar = ({
               <span>계산기</span>
             </div>
             
-            {/* 스티키 노트 메뉴 */}
             <div 
               className={`nav-item ${selectedMenu === MenuType.STICKY_NOTES ? 'active' : ''}`}
               onClick={() => setSelectedMenu(MenuType.STICKY_NOTES)}
@@ -160,18 +153,18 @@ const Sidebar = ({
         )}
       </nav>
       
-      {/* 설정 메뉴 */}
-      <div className="nav-item" style={{ marginTop: 'auto' }}>
-        <i className="material-icons">settings</i>
-        <span>설정</span>
-      </div>
-      
-      {/* 테마 전환 버튼 */}
-      <div className="nav-item" onClick={toggleTheme}>
-        <i className="material-icons">
-          {theme === 'light' ? 'dark_mode' : 'light_mode'}
-        </i>
-        <span>{theme === 'light' ? '다크 모드' : '라이트 모드'}</span>
+      {/* 사이드바 푸터 */}
+      <div className="sidebar-footer">
+        {/* 설정 메뉴 */}
+        <div 
+          className={`nav-item ${selectedMenu === MenuType.SETTINGS ? 'active' : ''}`}
+          onClick={() => {
+            setSelectedMenu(MenuType.SETTINGS);
+          }}
+        >
+          <i className="material-icons">settings</i>
+          <span>설정</span>
+        </div>
       </div>
     </div>
   );
